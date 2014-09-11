@@ -1348,6 +1348,24 @@ func (self *DataTestSuite) WhereConditionWithExpression(c *C) (Fun, Fun) {
 		}
 }
 
+func (self *DataTestSuite) JoinedWithSelf(c *C) (Fun, Fun) {
+	return func(client Client) {
+			client.WriteJsonData(`
+[
+  {
+    "name": "t",
+    "columns": ["time", "value"],
+    "points":[
+		  [1381346706000, 3],
+		  [1381346701000, 1]
+	  ]
+  }
+]`, c, influxdb.Millisecond)
+		}, func(client Client) {
+			client.RunInvalidQuery("select * from t as foo inner join t as bar", c, "m")
+		}
+}
+
 // issue #740 and #781
 func (self *DataTestSuite) JoiningDifferentFields(c *C) (Fun, Fun) {
 	return func(client Client) {
